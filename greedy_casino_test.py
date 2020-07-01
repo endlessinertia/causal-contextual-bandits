@@ -1,8 +1,5 @@
-import numpy as np
-from causal_binomial_bandit import CausalBinomialBandit
+from causal_binomial_bandit import *
 
-
-### FUNCTIONS ###
 
 def sample_context(p_d=0.5, p_b=0.5):
     return np.random.binomial(1, [p_d, p_b])
@@ -32,13 +29,15 @@ def sample_reward(payout_vector, arm):
     return np.random.binomial(1, payout_vector[arm])
 
 
-def run_greedy_casino(n_trials = 10000, algo='obs', verbose=False):
+def run_greedy_casino(n_trials = 1000, algo='obs', verbose=False):
 
     win_rate = 0.0
     n_arms = 2
 
-    if algo == 'ts' or algo == 'c_ts':
-        Bandit = CausalBinomialBandit(n_arms)
+    if algo == 'ts':
+        BTS = BinomialTS(n_arms)
+    elif algo == 'c_ts':
+        CTS = CausalTS(n_arms)
 
     for i in range(n_trials):
 
@@ -50,16 +49,16 @@ def run_greedy_casino(n_trials = 10000, algo='obs', verbose=False):
             arm_choice = player_choice
             rew = sample_reward(payout_vector, arm_choice)
         if algo == 'ts':
-            exp_reward_array = Bandit.expected_rewards_array()
-            arm_choice = Bandit.arm_selection(exp_reward_array)
+            exp_reward_array = BTS.expected_rewards_array()
+            arm_choice = BTS.arm_selection(exp_reward_array)
             rew = sample_reward(payout_vector, arm_choice)
-            Bandit.update_arm_parameters(arm_choice, rew)
+            BTS.update_arm_parameters(arm_choice, rew)
         if algo == 'c_ts':
-            cf_bias_array = Bandit.counterfactual_bias_array(player_choice)
-            exp_reward_array = Bandit.expected_rewards_array(cf_bias_array)
-            arm_choice = Bandit.arm_selection(exp_reward_array)
+            cf_bias_array = CTS.counterfactual_bias_array(player_choice)
+            exp_reward_array = CTS.expected_rewards_array(cf_bias_array)
+            arm_choice = CTS.arm_selection(exp_reward_array)
             rew = sample_reward(payout_vector, arm_choice)
-            Bandit.update_arm_parameters(arm_choice, rew)
+            CTS.update_arm_parameters(player_choice, arm_choice, rew)
 
         win_rate += float(rew)
 
@@ -70,12 +69,21 @@ def run_greedy_casino(n_trials = 10000, algo='obs', verbose=False):
             print('the system select arm = {}'.format(arm_choice))
             print('the sampled payout is {}'.format(payout_vector))
             print('the reward is = {}'.format(rew))
-            if algo == 'ts' or algo == 'c_ts':
-                print('cumulative regret = {}'.format(Bandit.cum_regret))
+            if algo == 'ts':
+                print('cumulative regret = {}'.format(BTS.cum_regret))
+                print('alpha parameters update = {}'.format(BTS.alpha_params))
+                print('beta parameters update = {}'.format(BTS.beta_params))
+            elif algo == 'c_ts':
+                print('cumulative regret = {}'.format(CTS.cum_regret))
+                print('alpha parameters update =\n {}'.format(CTS.alpha_params))
+                print('beta parameters update =\n {}'.format(CTS.beta_params))
 
     win_rate = win_rate / float(n_trials)
     print('\n\nEmpirical win rate for {} = {}'.format(algo, win_rate))
 
 
-run_greedy_casino(algo='c_ts', verbose=True)
+
+### RUN THE SCRIPT HERE ###
+run_greedy_casino(n_trials=10000, algo='c_ts', verbose=True)
+
 
