@@ -3,9 +3,9 @@ import numpy as np
 class ContextualBandit:
 
     '''
-    MetaBandits4Rec(user_id, d, context)
+    ContextualBandit(d, context)
 
-    Contextual bandit selection for algorithms ensemble (or items) based on both Thompson Sampling and Upper Confidence Bound policies.
+    Contextual bandit selection algorithm based on both Thompson Sampling and Upper Confidence Bound policies.
 
     Parameters
     --------
