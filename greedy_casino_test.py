@@ -115,5 +115,3 @@ def run_greedy_casino(n_trials = 1000, algo='obs', verbose=False):
 
 ### RUN THE SCRIPT HERE ###
 run_greedy_casino(n_trials=10000, algo='c_ts', verbose=True)
-
-
