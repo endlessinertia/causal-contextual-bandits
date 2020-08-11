@@ -54,11 +54,12 @@ class CausalCMAB:
 
         exp_reward_list = list()
         for arm in self.arms_list:
-            mu_tilde = np.random.multivariate_normal(self.mu_params_dict[(arm_intuition, arm)],
-                                                     np.linalg.inv(self.B_params_dict[(arm_intuition, arm)]),
+            idx_tuple = (arm_intuition, arm)
+            mu_tilde = np.random.multivariate_normal(self.mu_params_dict[idx_tuple],
+                                                     np.linalg.inv(self.B_params_dict[idx_tuple]),
                                                      size=1)[0]
             exp_reward = np.dot(mu_tilde, context)
-            exp_reward_list.extend(exp_reward)
+            exp_reward_list.append(exp_reward)
         return np.array(exp_reward_list)
 
 
@@ -77,7 +78,6 @@ class CausalCMAB:
         out : int
             Index of the max expected reward - i.e. the index of the selected arm.
         """
-
         return np.argmax(exp_reward_list, axis=0)
 
 
@@ -100,7 +100,7 @@ class CausalCMAB:
             Usually is 0 or 1, but can be any float in R.
 
         """
-        temp_b = self.B_arams_dict[(arm_intuition, arm_selection)]
+        temp_b = self.B_params_dict[(arm_intuition, arm_selection)]
         temp_b += np.dot(context.T, context)
         self.B_params_dict[(arm_intuition, arm_selection)] = temp_b
 
@@ -135,7 +135,7 @@ class CMAB:
         self.B_params_dict = dict()
         self.f_params_dict = dict()
 
-        for arm in self.arm_list:
+        for arm in self.arms_list:
             self.mu_params_dict[arm] = np.zeros(d)
             self.B_params_dict[arm] = np.eye(d)
             self.f_params_dict[arm] = np.zeros(d)
@@ -164,7 +164,7 @@ class CMAB:
                                                      np.linalg.inv(self.B_params_dict[arm]),
                                                      size=1)[0]
             exp_reward = np.dot(mu_tilde, context)
-            exp_reward_list.extend(exp_reward)
+            exp_reward_list.append(exp_reward)
         return np.array(exp_reward_list)
 
 
@@ -201,7 +201,6 @@ class CMAB:
             Array of the context (of dimension d) received as input for this round.
         reward : int or float
             The numeric reward received by selecting selected_arm. Usually is 0 or 1, but can be any float in R.
-
         """
         temp_b = self.B_params_dict[selected_arm]
         temp_b += np.dot(context.T, context)
