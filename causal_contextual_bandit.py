@@ -54,9 +54,8 @@ class CausalCMAB:
 
         exp_reward_list = list()
         for arm in self.arms_list:
-            idx_tuple = (arm_intuition, arm)
-            mu_tilde = np.random.multivariate_normal(self.mu_params_dict[idx_tuple],
-                                                     np.linalg.inv(self.B_params_dict[idx_tuple]),
+            mu_tilde = np.random.multivariate_normal(self.mu_params_dict[(arm_intuition, arm)],
+                                                     np.linalg.inv(self.B_params_dict[(arm_intuition, arm)]),
                                                      size=1)[0]
             exp_reward = np.dot(mu_tilde, context)
             exp_reward_list.append(exp_reward)

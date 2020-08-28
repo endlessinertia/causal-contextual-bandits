@@ -42,7 +42,7 @@ def init_classification(X_train, y_train):
 
 def run_bandit_simulation(X_train, y_train, verbose=False):
 
-    warnings.filterwarnings("ignore")
+    #warnings.filterwarnings("ignore")
     output_report = {
         'true_labels': list(),
         'classifier_arms': list(),
@@ -111,6 +111,6 @@ def run_bandit_simulation(X_train, y_train, verbose=False):
 
 ### RUN THE SCRIPT ###
 output_report = run_bandit_simulation(X_train, y_train, verbose=False)
-with open('./data/results/output_report.pickle', 'wb') as output_file:
+with open('./data/fashion/results/output_report.pickle', 'wb') as output_file:
     pickle.dump(output_report, output_file)
 
