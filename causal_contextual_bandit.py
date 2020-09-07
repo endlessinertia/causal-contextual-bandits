@@ -13,15 +13,18 @@ class CausalCMAB:
     Parameters
     --------
     n_arms : int
-        Number of arms (classes) in the contextual bandit problem.
+        Number of arms (classes/actions) in the contextual bandit problem.
     d : int
         Length of the context, i.e. dimension of the context vector and mu parameter.
+    bias: bool
+        Whether to use the bias vector to correct the arms expected reward.
 
     """
 
-    def __init__(self, n_arms, d):
+    def __init__(self, n_arms, d, bias):
 
         self.arms_list = range(n_arms)
+        self.use_bias = bias
 
         self.mu_params_dict = dict()
         self.B_params_dict = dict()
@@ -59,7 +62,49 @@ class CausalCMAB:
                                                      size=1)[0]
             exp_reward = np.dot(mu_tilde, context)
             exp_reward_list.append(exp_reward)
-        return np.array(exp_reward_list)
+
+        if self.use_bias:
+            bias_array = self.counterfactual_bias_array(context, arm_intuition)
+            return np.multiply(np.array(exp_reward_list), bias_array)
+        else:
+            return np.array(exp_reward_list)
+
+
+    def counterfactual_bias_array(self, context, arm_intuition):
+        """
+        Compute the bias array for all the candidate arms under the condition that the agent intended to
+        select the arm_intuition and the input context was provided.
+        The computation is based on expected value for the Gaussian under the input context.
+
+        Parameters
+        --------
+        context : 1D np.array
+            Array of the context (of dimension d) received as input for this round.
+        arm_intuition : int
+            The index of the arm intuitively selected by the user (i.e. a more trivial decision maker) for this round.
+
+        Returns
+        --------
+        out : 1D np.array
+            Array which contains the bias for each candidate arm, under the intuition of arm_intuition
+        """
+        bias_array = np.ones(len(self.arms_list))
+        # expected value for the Gaussian of arm_intuition, arm_intuition given the context
+        q2 = np.dot(self.mu_params_dict[arm_intuition, arm_intuition], context)
+
+        for arm in self.arms_list:
+            if arm == arm_intuition:
+                pass
+            else:
+                # expected value for the Gaussian of arm_intuition, arm given the context
+                q1 = np.dot(self.mu_params_dict[arm_intuition, arm], context)
+                bias = 1.0 - abs(q1 - q2)
+                if q1 > q2:
+                    if bias < bias_array[arm_intuition]:
+                        bias_array[arm_intuition] = bias
+                else:
+                    bias_array[arm] = bias
+        return bias_array
 
 
     @staticmethod
