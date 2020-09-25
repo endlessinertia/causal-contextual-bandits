@@ -13,8 +13,6 @@ MAX_ITERATIONS = 2000
 POSITIVE_REWARD = 1.0
 NEGATIVE_REWARD = 0.0
 NUM_TRIALS = 100
-NUM_REPLICA = 6
-
 
 ### DATA IMPORT ###
 
@@ -75,8 +73,6 @@ def run_dssapple_bandit(bandit_dataset, verbose=False):
         'true_labels': list(),
         'intuition_arms': list(),
         'intuition_reward': list(),
-        'bias_arms': list(),
-        'bias_reward': list(),
         'causal_arms': list(),
         'causal_reward': list(),
         'cmab_arms': list(),
@@ -99,7 +95,6 @@ def run_dssapple_bandit(bandit_dataset, verbose=False):
     print('Total number of instances: {}, length of the context: {}'.format(len(bandit_dataset), ctx_size))
 
     intuition_cum_reward = 0.0
-    bias_cum_reward = 0.0
     causal_cum_reward = 0.0
     cmab_cum_reward = 0.0
     ext_cmab_cum_reward = 0.0
@@ -108,7 +103,6 @@ def run_dssapple_bandit(bandit_dataset, verbose=False):
     cmab_model = CMAB(n_arms=num_arms, d=ctx_size)
     ext_cmab_model = CMAB(n_arms=num_arms, d=ctx_size+1)
     causal_model = CausalCMAB(n_arms=num_arms, d=ctx_size, bias=False)
-    bias_model = CausalCMAB(n_arms=num_arms, d=ctx_size, bias=True)
 
     for log_record in bandit_dataset:
 
@@ -128,20 +122,6 @@ def run_dssapple_bandit(bandit_dataset, verbose=False):
         intuition_cum_reward += reward        
         output_report['intuition_arms'].append(arm_intuition)
         output_report['intuition_reward'].append(intuition_cum_reward)
-
-        ### CAUSAL MODEL WITH BIAS ###
-        exp_reward_list = bias_model.get_expected_reward(log_record['context'], arm_intuition)
-        selected_arm = bias_model.select_best_arm(exp_reward_list)
-        reward = NEGATIVE_REWARD
-        if selected_arm == true_arm:
-            reward = POSITIVE_REWARD
-        bias_cum_reward += reward
-        output_report['bias_arms'].append(selected_arm)
-        output_report['bias_reward'].append(bias_cum_reward)
-        bias_model.parameters_update(arm_intuition, selected_arm, log_record['context'], reward)
-        if verbose:
-            print('The arm intuition by the user is {}, the causal bias cmab selects arm {}, the actual label is {}.'
-                  .format(arm_intuition, selected_arm, true_arm))
 
         ### CAUSAL MODEL ###
         exp_reward_list = causal_model.get_expected_reward(log_record['context'], arm_intuition)
@@ -192,9 +172,9 @@ def run_dssapple_bandit(bandit_dataset, verbose=False):
 
 ### RUN THE SCRIPT ###
 
-for t in range(97, NUM_TRIALS):
+for t in range(0, NUM_TRIALS):
     print('\n****************** START OF {} TRIAL ******************\n'.format(t))
-    bandit_dataset = create_bandit_dataset(logs_df, context_df, replica=NUM_REPLICA, dropout=0.2)
+    bandit_dataset = create_bandit_dataset(logs_df, context_df, replica=MAX_ITERATIONS//500, dropout=0.2)
     output_report = run_dssapple_bandit(bandit_dataset, verbose=False)
     print(output_report)
     with open('./data/dssapple/results/output_report{}.pickle'.format(t), 'wb') as output_file:
