@@ -1,0 +1,46 @@
+*** 2000 OBSERVATIONS IMAGES PCA CONTEXT ***
+
+Causal recall average = 0.3785, st.dev = 0.022303250884120013
+Extended TS recall average = 0.32955000000000007, st.dev = 0.02585773578641409
+Standard TS average = 0.32297999999999993, st.dev = 0.028570869780249947
+Observational recall average = 0.37087000000000003, st.dev = 0.001970558296524111
+
+paired t-test causal against cmab: Ttest_relResult(statistic=14.390129103208768, pvalue=5.26318902478442e-26)
+paired t-test causal against observational: Ttest_relResult(statistic=3.396993991704275, pvalue=0.0009823002061843205)
+paired t-test cmab against observational: Ttest_relResult(statistic=15.890733513462287, pvalue=5.406045304623708e-29)
+
+
+*** 2000 OBSERVATIONS SIMILARITIES PCA CONTEXT ***
+
+Causal recall average = 0.392045, st.dev = 0.028661655133645016
+Extended TS recall average = 0.34049999999999997, st.dev = 0.037954841588392914
+Standard TS average = 0.33954500000000004, st.dev = 0.03139777818572518
+Observational recall average = 0.37083999999999995, st.dev = 0.001659638514857981
+
+paired t-test causal against cmab: Ttest_relResult(statistic=11.395324847518378, pvalue=1.0202523030705342e-19)
+paired t-test causal against observational: Ttest_relResult(statistic=7.425691887670715, pvalue=3.9888169448555755e-11)
+paired t-test cmab against observational: Ttest_relResult(statistic=7.974233635734889, pvalue=2.7254056480625864e-12)
+
+
+*** 3000 OBSERVATIONS IMAGES PCA CONTEXT ***
+
+Causal recall average = 0.3941600000000001, st.dev = 0.02138314393265042
+Extended TS recall average = 0.32918, st.dev = 0.02555931750088627
+Standard TS average = 0.3223166666666667, st.dev = 0.0254594830618726
+Observational recall average = 0.37077333333333334, st.dev = 0.0014536391115633452
+
+paired t-test causal against cmab: Ttest_relResult(statistic=18.727224584606866, pvalue=2.628114532436304e-34)
+paired t-test causal against observational: Ttest_relResult(statistic=10.803815240375654, pvalue=1.9451200075292263e-18)
+paired t-test cmab against observational: Ttest_relResult(statistic=16.274657098130785, pvalue=9.723455335343602e-30)
+
+
+*** 3000 OBSERVATIONS IMAGES SIMILARITIES CONTEXT ***
+
+Causal recall average = 0.4032333333333334, st.dev = 0.027827304736335656
+Extended TS recall average = 0.34285999999999994, st.dev = 0.03662109835114786
+Standard TS average = 0.3397166666666667, st.dev = 0.03460787883961942
+Observational recall average = 0.37074999999999997, st.dev = 0.0016782100252617036
+
+paired t-test causal against cmab: Ttest_relResult(statistic=13.517351115629651, pvalue=3.2568823291437005e-24)
+paired t-test causal against observational: Ttest_relResult(statistic=11.463954625471235, pvalue=7.256957235894294e-20)
+paired t-test cmab against observational: Ttest_relResult(statistic=7.6174551116599885, pvalue=1.5687252691775805e-11)

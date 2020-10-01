@@ -3,9 +3,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import collections
+from scipy import stats
 
 
 ### HELPER FUNCTIONS ###
+
+
+def compute_final_recall_statistic(results_folder, num_obs):
+    filenames = os.listdir(results_folder)
+    outputs_list = list()
+    for fn in filenames:
+        with open(results_folder + fn, 'rb') as output_file:
+            outputs_list.append(pickle.load(output_file))
+
+    causal_final_recall_list = np.array([out_dict['causal_reward'][-1] / num_obs for out_dict in outputs_list])
+    ext_cmab_final_recall_list = np.array([out_dict['ext_cmab_reward'][-1] / num_obs for out_dict in outputs_list])
+    cmab_final_recall_list = np.array([out_dict['cmab_reward'][-1] / num_obs for out_dict in outputs_list])
+    obs_final_recall_list = np.array([out_dict['intuition_reward'][-1] / num_obs for out_dict in outputs_list])
+
+    print('Causal recall average = {}, st.dev = {}'.format(causal_final_recall_list.mean(), causal_final_recall_list.std()))
+    print('Extended TS recall average = {}, st.dev = {}'.format(ext_cmab_final_recall_list.mean(), ext_cmab_final_recall_list.std()))
+    print('Standard TS average = {}, st.dev = {}'.format(cmab_final_recall_list.mean(), cmab_final_recall_list.std()))
+    print('Observational recall average = {}, st.dev = {}\n'.format(obs_final_recall_list.mean(), obs_final_recall_list.std()))
+
+    print('paired t-test causal against cmab: {}'.format(stats.ttest_rel(causal_final_recall_list, ext_cmab_final_recall_list)))
+    print('paired t-test causal against observational: {}'.format(stats.ttest_rel(causal_final_recall_list, obs_final_recall_list)))
+    print('paired t-test cmab against observational: {}'.format(stats.ttest_rel(obs_final_recall_list, ext_cmab_final_recall_list)))
+
+
 
 def compute_metric_average(outputs_list, metric):
     list_metric_arrays = [np.array(out_dict[metric]) for out_dict in outputs_list]
@@ -29,7 +54,7 @@ def plot_average_cumulative_reward(results_folder, plot_title):
              range(len(cmab_avg_rew)), cmab_avg_rew, 'r',
              range(len(obs_avg_rew)), obs_avg_rew, 'k--')
     plt.legend(('Causal_TS', 'Extended_TS', 'Standard_TS', 'Observational'))
-    plt.xlabel('# observation')
+    plt.xlabel('observations')
     plt.ylabel('cumulative reward')
     plt.title(plot_title)
     plt.show()
@@ -75,55 +100,65 @@ def plot_arms_distribution(results_folder, plot_title):
     plt.show()
 
 
-### 1000 Observations - Full Random Data - Sum of Images PCA Context ###
-
-folder_name = './data/dssapple/results/1000inst-random_sum-pca-ctx/'
-plot_average_cumulative_reward(folder_name, '1000 Observations - Full Random Data - Sum of Images PCA Context')
-
-### 1000 Observations - Full Random Data - Sum of Similarities PCA Context ###
-
-folder_name = './data/dssapple/results/1000inst-random_sum-pca-sim-ctx/'
-plot_average_cumulative_reward(folder_name, '1000 Observations - Full Random Data - Sum of Similarities PCA Context')
+# ### 1000 Observations - Full Random Data - Sum of Images PCA Context ###
+#
+# folder_name = './data/dssapple/results/1000inst-random_sum-pca-ctx/'
+# plot_average_cumulative_reward(folder_name, '1000 Observations - Full Random Data - Sum of Images PCA Context')
+#
+# ### 1000 Observations - Full Random Data - Sum of Similarities PCA Context ###
+#
+# folder_name = './data/dssapple/results/1000inst-random_sum-pca-sim-ctx/'
+# plot_average_cumulative_reward(folder_name, '1000 Observations - Full Random Data - Sum of Similarities PCA Context')
 
 ### 2000 Observations - Random Data Dropout - Sum of Images PCA Context ###
 
 folder_name = './data/dssapple/results/2000inst-random-drop_sum-pca-ctx/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Random Data Dropout - Sum of Images PCA Context')
+plot_average_cumulative_reward(folder_name, '')
+plot_arms_distribution(folder_name, '')
+print('\n*** 2000 OBSERVATIONS IMAGES PCA CONTEXT ***')
+compute_final_recall_statistic(folder_name, 2000)
 
 ### 2000 Observations - Random Data Dropout - Sum of Similarities PCA Context ###
 
 folder_name = './data/dssapple/results/2000inst-random-drop_sum-pca-sim-ctx/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Random Data Dropout - Sum of Similarities PCA Context')
+plot_average_cumulative_reward(folder_name, '')
+plot_arms_distribution(folder_name, '')
+print('\n*** 2000 OBSERVATIONS SIMILARITIES PCA CONTEXT ***')
+compute_final_recall_statistic(folder_name, 2000)
 
-### 2000 Observations - Test Images KB Context ###
-
-folder_name = './data/dssapple/results/2000inst_test-kb-ctx/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB Context')
-
-### 2000 Observations - Test Images KB Context - Negative Reward ###
-
-folder_name = './data/dssapple/results/2000inst_test-kb-ctx_neg-1/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB Context - Negative Reward')
-
-
-### 2000 Observations - Test Images KB PCA Context ###
-
-folder_name = './data/dssapple/results/2000inst_pca-test-kb-ctx/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB PCA Context')
-
-### 2000 Observations - Random Data Dropout - Hybrid Context: PCA Sum Sim + PCA KB Test ###
-
-folder_name = './data/dssapple/results/2000inst-random-drop_hybrid-ctx-pca-test-kb+sum-pca-sim/'
-plot_average_cumulative_reward(folder_name, '2000 Observations - Random Data Dropout - Hybrid Context: PCA Sum Sim + PCA KB Test')
+# ### 2000 Observations - Test Images KB Context ###
+#
+# folder_name = './data/dssapple/results/2000inst_test-kb-ctx/'
+# plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB Context')
+#
+# ### 2000 Observations - Test Images KB Context - Negative Reward ###
+#
+# folder_name = './data/dssapple/results/2000inst_test-kb-ctx_neg-1/'
+# plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB Context - Negative Reward')
+#
+#
+# ### 2000 Observations - Test Images KB PCA Context ###
+#
+# folder_name = './data/dssapple/results/2000inst_pca-test-kb-ctx/'
+# plot_average_cumulative_reward(folder_name, '2000 Observations - Test Images KB PCA Context')
+#
+# ### 2000 Observations - Random Data Dropout - Hybrid Context: PCA Sum Sim + PCA KB Test ###
+#
+# folder_name = './data/dssapple/results/2000inst-random-drop_hybrid-ctx-pca-test-kb+sum-pca-sim/'
+# plot_average_cumulative_reward(folder_name, '2000 Observations - Random Data Dropout - Hybrid Context: PCA Sum Sim + PCA KB Test')
 
 ### 3000 Observations - Random Data Dropout - Sum of Images PCA Context ###
 
 folder_name = './data/dssapple/results/3000inst-random-drop_sum-pca-ctx/'
-plot_average_cumulative_reward(folder_name, '3000 Observations - Random Data Dropout - Sum of Images PCA Context')
-plot_arms_distribution(folder_name, '3000 Observations - Random Data Dropout - Sum of Images PCA Context')
+plot_average_cumulative_reward(folder_name, '')
+plot_arms_distribution(folder_name, '')
+print('\n*** 3000 OBSERVATIONS IMAGES PCA CONTEXT ***')
+compute_final_recall_statistic(folder_name, 3000)
 
 ### 3000 Observations - Random Data Dropout - Sum of Similarities PCA Context ###
 
 folder_name = './data/dssapple/results/3000inst-random-drop_sum-pca-sim-ctx/'
-plot_average_cumulative_reward(folder_name, '3000 Observations - Random Data Dropout - Sum of Similarities PCA Context')
-plot_arms_distribution(folder_name, '3000 Observations - Random Data Dropout - Sum of Similarities PCA Context')
+plot_average_cumulative_reward(folder_name, '')
+plot_arms_distribution(folder_name, '')
+print('\n*** 3000 OBSERVATIONS IMAGES SIMILARITIES CONTEXT ***')
+compute_final_recall_statistic(folder_name, 3000)
